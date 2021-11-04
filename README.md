@@ -12,6 +12,7 @@ Wearable Fall Alert System
 
 
 ## Development Environment
+- [Arduino IDE](https://www.arduino.cc/en/software)
 - [Visual Studio Code](https://code.visualstudio.com/)
 - [EditorConfig for VS Code](https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig)
 - [Install Docker on Windows 10](https://hackmd.io/@Jench2103/ByBj5vMbY)
