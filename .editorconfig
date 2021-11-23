@@ -11,6 +11,9 @@ trim_trailing_whitespace = false
 [*.sh]
 end_of_line = lf
 
+[*.yml]
+indent_size = 2
+
 [*.html]
 indent_size = 2
 
