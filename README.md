@@ -16,7 +16,38 @@ Wearable Fall Alert System
 - [Visual Studio Code](https://code.visualstudio.com/)
 - [EditorConfig for VS Code](https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig)
 - [Install Docker on Windows 10](https://hackmd.io/@Jench2103/ByBj5vMbY)
-- [使用微軟Visual Studio Code編寫Arduino程式（二）](https://swf.com.tw/?p=1233)
+
+### Configuration Example for VS Code : `./vscode/c_cpp_properties.json`
+```json
+{
+    "configurations": [
+        {
+            "name": "Arduino Uno",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "C:/Program Files (x86)/Arduino/hardware/arduino/avr/cores/arduino",
+                "C:/Program Files (x86)/Arduino/tools/**",
+                "C:/Program Files (x86)/Arduino/hardware/arduino/avr/**",
+                "C:/Program Files (x86)/Arduino/hardware/tools/**",
+                "C:/Program Files (x86)/Arduino/libraries/**",
+                "C:/Users/${env:Username}/Documents/Arduino/libraries/**"
+            ],
+            "forcedInclude": [
+                "C:/Program Files (x86)/Arduino/hardware/arduino/avr/cores/arduino/Arduino.h"
+            ],
+            "defines": [
+                "USBCON",
+                "ARDUINO=10809"
+            ],
+            "intelliSenseMode": "clang-x64",
+            "compilerPath": "C:/Program Files (x86)/Arduino/hardware/tools/avr/bin/avr-gcc.exe",
+            "cStandard": "c11",
+            "cppStandard": "c++17"
+        }
+    ],
+    "version": 4
+}
+```
 
 
 ## Reference
