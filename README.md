@@ -17,7 +17,7 @@ Wearable Fall Alert System
 - [EditorConfig for VS Code](https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig)
 - [Install Docker on Windows 10](https://hackmd.io/@Jench2103/ByBj5vMbY)
 
-### Configuration Example for VS Code : `./vscode/c_cpp_properties.json`
+### Configuration Example for VS Code : `./.vscode/c_cpp_properties.json`
 ```json
 {
     "configurations": [
