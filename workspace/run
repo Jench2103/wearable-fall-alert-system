@@ -55,7 +55,6 @@ remove_docker_image() {
     if [[ "$(docker images -q $IMAGE_NAME)" != "" ]]; then
         docker rmi $IMAGE_NAME
     fi
-    docker builder prune -a -f
 }
 
 export DOCKER_SCAN_SUGGEST=false
