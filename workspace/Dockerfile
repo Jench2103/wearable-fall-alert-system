@@ -24,11 +24,10 @@ RUN groupadd -g $GID -o $NAME
 RUN useradd -u ${UID} -m -s /bin/bash -g ${NAME} -G plugdev ${NAME} && \
 	echo "${NAME} ALL = NOPASSWD: ALL" > /etc/sudoers.d/${NAME} && \
     chmod 0440 /etc/sudoers.d/${NAME}
-RUN chown -R ${NAME}:${NAME} /home/${NAME}
 
 RUN ln -s /workspace /home/${NAME}/workspace
-
 ADD ./scripts/.bash_profile /home/${NAME}/
+RUN chown -R ${NAME}:${NAME} /home/${NAME}
 
 RUN wget -O /tmp/vscode-server-linux-x64.tar.gz https://update.code.visualstudio.com/commit:${VSCODE_SERVER_VERSION}/server-linux-x64/stable
 RUN mkdir -p /home/${NAME}/.vscode-server/bin/${VSCODE_SERVER_VERSION}
@@ -42,5 +41,7 @@ RUN echo "PermitRootLogin no" >> /etc/ssh/sshd_config
 RUN echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config
 RUN /etc/init.d/ssh restart
 EXPOSE 22
+
+VOLUME /workspace
 
 CMD [ "/usr/sbin/sshd" , "-D" ]

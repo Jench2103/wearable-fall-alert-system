@@ -2,6 +2,7 @@
 
 IMAGE_NAME="wfas-workspace"
 CONTAINER_NAME="wfas-workspace"
+SSH_PASSWORD="abcd"
 
 set -e
 
@@ -25,8 +26,9 @@ EOF
 start_environment() {
     if [[ "$(docker images -q $IMAGE_NAME)" == "" ]]; then
         cp ../Server/requirements.txt ./server_requirements.txt > /dev/null 2>&1 || touch server_requirements.txt
-        docker build --build-arg UID=$(id -u) --build-arg GID=$(id -g)  -t $IMAGE_NAME . \
+        docker build --build-arg UID=$(id -u) --build-arg GID=$(id -g) --build-arg DEFAULT_PWD=${SSH_PASSWORD} -t $IMAGE_NAME . \
             || { echo "error due to docker build image" && exit 1; }
+        [[ $OSTYPE == "msys" ]] && sed -i '/127.0.0.1/d' ~/.ssh/known_hosts
         rm server_requirements.txt
     fi
 
@@ -35,13 +37,7 @@ start_environment() {
             || { echo "error due to docker build image" && exit 1; }
     fi
 
-    if [ $OSTYPE == "msys" ]; then
-        sed -i '/127.0.0.1/d' ~/.ssh/known_hosts
-        CONTAINER_IP="$(docker inspect --format="{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}" $CONTAINER_NAME)"
-    else
-        CONTAINER_IP="$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $CONTAINER_NAME)"
-    fi
-
+    echo -e "\nThe password of SSH login : ${SSH_PASSWORD}\n"
     ssh -p 22 user@127.0.0.1
 }
 
