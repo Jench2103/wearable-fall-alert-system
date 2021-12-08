@@ -36,6 +36,9 @@ RUN chown -R ${NAME}:${NAME} /home/${NAME}
 
 RUN echo "${NAME}:${DEFAULT_PWD}" | chpasswd
 
+ADD ./bin/ngrok /bin/ngrok
+RUN chmod 755 /bin/ngrok
+
 RUN echo "Port 22" >> /etc/ssh/sshd_config
 RUN echo "PermitRootLogin no" >> /etc/ssh/sshd_config
 RUN echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config

@@ -1,2 +1,11 @@
-# Folders
+# VSCode
 .vscode/
+
+# Arduino
+
+
+# Server
+Server/__pycache__/
+Server/flaskr/__pycache__/
+
+# workspace
