@@ -6,6 +6,9 @@
 
 # Server
 Server/__pycache__/
+Server/data/
 Server/flaskr/__pycache__/
+Server/volume/
 
 # workspace
+workspace/server_requirements.txt
