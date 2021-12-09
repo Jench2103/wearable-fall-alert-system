@@ -1,4 +1,4 @@
-from flaskr import webview, linebot
+from flaskr import app_webview, app_linebot, app_arduino
 from flaskr import app
 from flaskr.models import db
 
