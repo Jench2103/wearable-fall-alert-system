@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  flask_server:
+    container_name: flask_server
+    build: .
+    volumes:
+      - ./volume/data:/workspace/data
+    ports:
+      - 5000:5000
