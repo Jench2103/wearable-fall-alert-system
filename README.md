@@ -8,6 +8,7 @@
     - [Web Service Deploying](#web-service-deploying)
     - [Docker Workspace for Server](#docker-workspace-for-server)
 - [Configuration Example for VSCode Development](#configuration-example-for-vscode-development)
+- [Attribution](#attribution)
 - [Reference](#reference)
 
 
@@ -29,13 +30,13 @@ Wearable Fall Alert System
 
 
 ## Working on this Project
-- You should clone this repository before start working
+- Clone this repository before start working
     ```bash
     $ git clone https://github.com/Jench2103/wearable-fall-alert-system.git
     ```
 
 ### Web Service Deploying
-- The service will execute in a docker container and could be access via `Port 5000`
+- The service will run in a docker container and could be access via `Port 5000`
     ```bash
     $ cd /path/to/wearable-fall-alert-system
     $ cd Server
@@ -75,7 +76,7 @@ Wearable Fall Alert System
 
 ## Configuration Example for VSCode Development
 - `.vscode/c_cpp_properties.json`
-    ```json {.line-numbers}
+    ```json
     {
         "configurations": [
             {
@@ -105,6 +106,10 @@ Wearable Fall Alert System
         "version": 4
     }
     ```
+
+
+## Attribution
+- [Mirko Broadband Services Website Bootstrap HTML Template - Inovatik](https://inovatik.com/mirko-broadband-services-website-bootstrap-html-template.html)
 
 
 ## Reference
