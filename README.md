@@ -4,7 +4,7 @@
 ## Table of Contents
 - [Structure of the Project](#structure-of-the-project)
 - [Environment Setup](#environment-setup)
-- [Working on This Project](#working-on-this-project)
+- [Working on this Project](#working-on-this-project)
     - [Web Service Deploying](#web-service-deploying)
     - [Docker Workspace for Server](#docker-workspace-for-server)
 - [Configuration Example for VSCode Development](#configuration-example-for-vscode-development)
@@ -23,30 +23,34 @@ Wearable Fall Alert System
 
 ## Environment Setup
 - [Arduino IDE](https://www.arduino.cc/en/software)
-- [Visual Studio Code](https://code.visualstudio.com/)
+- [Git](https://git-scm.com/downloads)
 - [Install Docker on Windows 10](https://hackmd.io/@Jench2103/ByBj5vMbY)
+- [Visual Studio Code](https://code.visualstudio.com/)
 
 
-## Working on This Project
+## Working on this Project
 - You should clone this repository before start working
     ```bash
     $ git clone https://github.com/Jench2103/wearable-fall-alert-system.git
     ```
 
 ### Web Service Deploying
-- The service will execute in a docker container and could be access via port `5000`
+- The service will execute in a docker container and could be access via `Port 5000`
     ```bash
-    $ cd wearable-fall-alert-system/Server
+    $ cd /path/to/wearable-fall-alert-system
+    $ cd Server
     $ docker-compose up --build
     ```
-- Stop the container by pressing `ctrl + c`
+- Stop the container by pressing `CTRL + C`
 - Remove the container
     ```bash
+    $ cd /path/to/wearable-fall-alert-system
+    $ cd Server
     $ docker-compose down
     ```
 
 ### Docker Workspace for Server
-- Show all available commands
+- Show all available commands provided py `workspace/run`
     ```bash
     $ cd /path/to/wearable-fall-alert-system
     $ ./workspace/run
