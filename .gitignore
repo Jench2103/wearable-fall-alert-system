@@ -2,7 +2,7 @@
 .vscode/
 
 # Arduino
-
+Arduino/test.ino
 
 # Server
 Server/__pycache__/
