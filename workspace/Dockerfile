@@ -5,7 +5,6 @@ ARG GID=1000
 ARG NAME=user
 ARG DEFAULT_PWD=abcd
 ARG TZ=Asia/Taipei
-ARG VSCODE_SERVER_VERSION=ccbaa2d27e38e5afa3e5c21c1c7bef4657064247
 
 # change timezone
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
@@ -13,7 +12,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install apt-utils software-properties-common
 RUN add-apt-repository ppa:git-core/ppa
 
-RUN apt-get update && apt-get upgrade
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y upgrade
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install sudo vim git nano wget locales openssh-server
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install python3.8 python3-pip
 
@@ -29,16 +28,13 @@ ADD server_requirements.txt /tmp
 RUN pip3 install -r /tmp/server_requirements.txt
 
 # add non-root user account
-RUN groupadd -g $GID -o $NAME
+RUN groupadd -g ${GID} -o ${NAME}
 RUN useradd -u ${UID} -m -s /bin/bash -g ${NAME} -G plugdev ${NAME} && \
 	echo "${NAME} ALL = NOPASSWD: ALL" > /etc/sudoers.d/${NAME} && \
     chmod 0440 /etc/sudoers.d/${NAME}
 
-# setup vscode server for SSH development
-RUN wget -O /tmp/vscode-server-linux-x64.tar.gz https://update.code.visualstudio.com/commit:${VSCODE_SERVER_VERSION}/server-linux-x64/stable
-RUN mkdir -p /home/${NAME}/.vscode-server/bin/${VSCODE_SERVER_VERSION}
-RUN tar -xf /tmp/vscode-server-linux-x64.tar.gz -C /home/${NAME}/.vscode-server/bin
-RUN mv -T /home/${NAME}/.vscode-server/bin/vscode-server-linux-x64 /home/${NAME}/.vscode-server/bin/${VSCODE_SERVER_VERSION}
+# create directory for vscode server
+RUN mkdir -p /home/${NAME}/.vscode-server/
 
 # user account configuration
 RUN ln -s /workspace /home/${NAME}/workspace

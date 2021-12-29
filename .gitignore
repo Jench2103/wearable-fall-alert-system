@@ -12,3 +12,4 @@ Server/volume/
 
 # workspace
 workspace/server_requirements.txt
+workspace/temp/
