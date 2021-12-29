@@ -1,4 +1,5 @@
 from __future__ import annotations
+from enum import unique
 import json
 import random
 import string
@@ -41,17 +42,18 @@ class User(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String, unique=True)
-    password_hash = db.Column(db.Text)
+    # password_hash = db.Column(db.Text)
     name = db.Column(db.String, nullable=True)
     sex = db.Column(db.String, nullable=True)
     birthday = db.Column(db.Date, nullable=True)
     blood_type = db.Column(db.String, nullable=True)
     line_id = db.Column(db.Text, nullable=True)
     insurer_id = db.Column(db.Integer, nullable=True)
+    hospital = db.Column(db.Text, unique=False, nullable=True)
 
     def __init__(self, username: str, **kwargs):
         self.username = username
-        self.password_hash = generate_password_hash(kwargs['password']) if 'password' in kwargs else None
+        # self.password_hash = generate_password_hash(kwargs['password']) if 'password' in kwargs else None
         self.name = kwargs['name'] if 'name' in kwargs else None
         self.sex = kwargs['sex'] if '' in kwargs else None
         self.birthday = kwargs['birthday'] if 'birthday' in kwargs else None
@@ -61,24 +63,24 @@ class User(db.Model):
     def __repr__(self) -> str:
         return '<User {}>'.format(self.username)
         
-    def set_password(self, password: str) -> None:
-        self.password_hash = generate_password_hash(password)
-        DatabaseManager.update()
+    # def set_password(self, password: str) -> None:
+    #     self.password_hash = generate_password_hash(password)
+    #     DatabaseManager.update()
 
-    def check_password(self, password: str) -> bool:
-        return check_password_hash(self.password_hash, password)
+    # def check_password(self, password: str) -> bool:
+    #     return check_password_hash(self.password_hash, password)
 
     def remove(self) -> bool:
         return DatabaseManager.delete(self)
 
     @classmethod
-    def create(cls, username: str, password: str, **kwargs) -> User:
+    def create(cls, username: str, **kwargs) -> User:
         # check USERNAME duplication
         if cls.query.filter(func.lower(cls.username) == func.lower(username)).first() is not None:
             raise ValueError('username')
 
         # generate new user
-        new_user = cls(username, password=password, **kwargs)
+        new_user = cls(username, **kwargs)
         DatabaseManager.create(new_user)
         return new_user
 
@@ -103,8 +105,8 @@ class EmergencyContact(db.Model):
 
 
     @classmethod
-    def create(cls, user_id: int) -> EmergencyContact:
-        new_emergency_contact = cls(user_id)
+    def create(cls, user_id: int, **kwargs) -> EmergencyContact:
+        new_emergency_contact = cls(user_id, **kwargs)
         DatabaseManager.create(new_emergency_contact)
         return new_emergency_contact
 
@@ -119,16 +121,18 @@ class EmergencyEvent(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, unique=False)
     time = db.Column(db.DateTime, unique=False)
-    location = db.Column(db.Text, unique=False, nullable=True)
-    user_status = db.Column(db.Text, unique=False, nullable=True)
-    event_status = db.Column(db.Text, unique=False, nullable=True)
+    location = db.Column(db.Text, unique=False, nullable=True)  # {"gps": {"longitude": 121.0, "latitude": 24.0}, "address": ""}
+    user_status = db.Column(db.Text, unique=False, nullable=True)   # {"heart_rate": 120}
+    event_status = db.Column(db.Text, unique=False, nullable=True)  # [{"time": "", "type": "", "agency": "", "content": ""}]
+    web_token = db.Column(db.Text, unique=True)
 
     def __init__(self, user_id: int, time: datetime, **kwargs):
         self.user_id = user_id
         self.time = time
-        self.location = json.dumps(kwargs['location'], ensure_ascii=False) if type(kwargs.get('location', None)) == dict else None
-        self.user_status = json.dumps(kwargs['user_status'], ensure_ascii=False) if type(kwargs.get('user_status', None)) == dict else None
-        self.event_status = json.dumps(kwargs['event_status'], ensure_ascii=False) if type(kwargs.get('event_status', None)) == dict else None
+        self.location = json.dumps(kwargs.get('location', None), ensure_ascii=False) if type(kwargs.get('location', None)) == dict else json.dumps(dict(), ensure_ascii=False)
+        self.user_status = json.dumps(kwargs.get('user_status', None), ensure_ascii=False) if type(kwargs.get('user_status', None)) == dict else json.dumps(dict(), ensure_ascii=False)
+        self.event_status = json.dumps(kwargs.get('event_status', None), ensure_ascii=False) if type(kwargs.get('event_status', None)) == dict else json.dumps(dict(), ensure_ascii=False)
+        self.web_token = kwargs.get('web_token', '')
 
     def remove(self) -> bool:
         return DatabaseManager.delete(self)
@@ -136,7 +140,11 @@ class EmergencyEvent(db.Model):
 
     @classmethod
     def create(cls, user_id: int, **kwargs) -> EmergencyEvent:
-        new_emergency_event = cls(user_id, kwargs.get('time', datetime.now()), **kwargs)
+        while True:
+            token = ''.join(random.choice(string.ascii_letters + string.digits) for x in range(12))
+            if cls.query.filter_by(web_token=token).first() is None:
+                break
+        new_emergency_event = cls(user_id, kwargs.get('time', datetime.now()), web_token=token, **kwargs)
         DatabaseManager.create(new_emergency_event)
         return new_emergency_event
 
@@ -226,8 +234,8 @@ class LineToken(db.Model):
 
 
     @classmethod
-    def generate(cls, owner_class_name: str, owner_object_id: int, disposable: bool = True, token_length: int = 12) -> str:
-        token_length = 12 if token_length <= 0 or token_length > 64 else token_length
+    def generate(cls, owner_class_name: str, owner_object_id: int, disposable: bool = False, token_length: int = 6) -> str:
+        token_length = 6 if token_length <= 0 or token_length > 24 else token_length
         while True:
             token = ''.join(random.choice(string.ascii_letters + string.digits) for x in range(token_length))
             if cls.get_match_token(token) is None:
@@ -240,9 +248,11 @@ class LineToken(db.Model):
     @classmethod
     def get_match_token(cls, token: str) -> Union[LineToken, None]:
         for token_object in (cls.query.all() or []):
-            if not token_object.disposable and token_object.has_used:
+            if token_object.disposable and token_object.has_used:
                 DatabaseManager.delete(token_object)
                 continue
             if check_password_hash(token_object.token_hash, token):
+                token_object.has_used = True
+                DatabaseManager.update(token_object)
                 return token_object
         return None

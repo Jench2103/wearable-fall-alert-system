@@ -1,3 +1,6 @@
+# Server Deploying
+BASE_URL = ''
+
 # SMTP Service
 SMTP_SENDER_NAME = ''
 SMTP_SENDER_EMAIL = ''
@@ -10,3 +13,6 @@ SMTP_ACCOUNT_PASSWORD = ''
 # Linebot
 LINEBOT_CHANNEL_ACCESS_TOKEN = ''
 LINEBOT_CHANNEL_SECRET = ''
+
+# Google Map API
+GOOGLE_CLOUD_API_KEY = ''

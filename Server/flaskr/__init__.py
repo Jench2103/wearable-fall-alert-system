@@ -2,6 +2,9 @@ import os
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flaskext.markdown import Markdown
+
+from linebot import LineBotApi, WebhookHandler
 
 from . import config
 
@@ -20,6 +23,12 @@ app = Flask(__name__, template_folder=FLASK_TEMPLATE_PATH, static_folder=FLASK_S
 
 # import config from config.py
 app.config.from_object(config)
+
+line_bot_api = LineBotApi(app.config['LINEBOT_CHANNEL_ACCESS_TOKEN'])
+line_bot_handler = WebhookHandler(app.config['LINEBOT_CHANNEL_SECRET'])
+
+# initialize markdown module for app
+Markdown(app)
 
 # set SQLAlchemy config
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + SQLITE_PATH + '/data.sqlite'
