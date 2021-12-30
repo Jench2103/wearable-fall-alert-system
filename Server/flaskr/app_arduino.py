@@ -162,7 +162,7 @@ def new_event():
                 latitude=str(gps_latitude), 
                 longitude=str(gps_longitude), 
                 hospital=user.hospital,
-                url=url_for('event', token=emergency_event.web_token, _external=True)  
+                url=url_for('event', token=emergency_event.web_token, editable='False', _external=True)
             )
     }
 

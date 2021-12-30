@@ -33,6 +33,8 @@ def event(token):
         user_object = User.query.get(event_object.user_id)
         event_location = json.loads(event_object.location)
         event_status = json.loads(event_object.event_status)
+        editable = bool(request.values.get('editable', False))
+
     except:
         abort(404)
 
@@ -55,7 +57,8 @@ def event(token):
     var = {
         'user': {'name': user_object.name, 'sex': user_object.sex, 'birthday': user_object.birthday},
         'event': {'time': event_object.time.strftime("%Y-%m-%d %H:%M"), 'gps': '', 'address': event_location['address']}, 
-        'record': event_status.sort(key=lambda msg: datetime.strptime(msg['time'], '%Y-%m-%d %H:%M'), reverse=True)
+        'record': event_status.sort(key=lambda msg: datetime.strptime(msg['time'], '%Y-%m-%d %H:%M'), reverse=True),
+        'editable': editable
     }
 
     var['gps'] = '{longitude}°E {latitude}°N'.format(
