@@ -25,7 +25,7 @@ def arduino_test():
     arguments and corresponding values to the client for debugging.
     """
     print(request.args)
-    return str(request.args)
+    return str(request.args.to_dict())
 
 
 @app.route('/arduino/inviting-token', methods=['GET'])
@@ -63,7 +63,9 @@ def create_user():
     Return value: ID of the new account
     """
     try:
-        username = request.args.get('username')
+        username = request.args.get('username', None)
+        if username == None or len(username) == 0 or username.isspace():
+            raise ValueError()
     except:
         abort(404)
     
@@ -73,8 +75,12 @@ def create_user():
     blood_type = request.args.get('blood_type', None)
     hospital = request.args.get('hospital', None)
 
-    new_user = User.create(username, name=name, sex=sex, birthday=birthday, blood_type=blood_type, hospital=hospital)
-    return new_user.id
+    try:
+        new_user = User.create(username, name=name, sex=sex, birthday=birthday, blood_type=blood_type, hospital=hospital)
+    except:
+        abort(404)
+    
+    return str(new_user.id)
 
 
 @app.route('/arduino/user/login', methods=['GET'])
@@ -94,7 +100,8 @@ def arduino_user_login():
     """
     try:
         username = request.args.get('username')
-        user_object = User.query.filter_by(username=username).first()
+        user_id = User.query.filter_by(username=username).first().id
+        user_object = User.query.get(user_id)
     except:
         abort(404)
 
@@ -105,8 +112,9 @@ def arduino_user_login():
     result['sex'] = user_object.sex if user_object.sex else 'None'
     result['birthday'] = str(user_object.birthday) if user_object.birthday else 'None'
     result['blood_type'] = user_object.blood_type if user_object.blood_type else 'None'
+    result['hospital'] = user_object.hospital if user_object.hospital else 'None'
 
-    return str(result)
+    return json.dumps(result, ensure_ascii=False)
 
 
 @app.route('/event/new', methods=['GET', 'POST'])
@@ -168,3 +176,5 @@ def new_event():
 
     for emergency_contact in (EmergencyContact.query.filter_by(user_id=user.id).all() or []):
         line_bot_api.push_message(emergency_contact.line_id, linebot_message['emergency_contact'])
+
+    return str(emergency_event.web_token)
