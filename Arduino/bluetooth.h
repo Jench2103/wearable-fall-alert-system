@@ -79,7 +79,7 @@ void BLUETOOTH::reset() // 事件結束，將if_buzzer_on回復預設值-1，eve
 
 void BLUETOOTH::arduino_to_phone(double gps_longtitude, double gps_latitude, int bpm) // 事件發生時傳送地點、心律等資訊至手機，傳送格式: 經度,緯度,心律;
 {
-    String string_to_phone = String(gps_longtitude, n_after_point_lo) + ',' + String(gps_latitude, n_after_point_la) + ',' + String(bpm) + ';';
+    String string_to_phone = "&heart_rate=" + String(bpm) + "&gps_longitude=" + String(gps_longtitude, n_after_point_lo) + "&gps_latitude=" + String(gps_latitude, n_after_point_la);
 
     BTSerial.println(string_to_phone);
 }
