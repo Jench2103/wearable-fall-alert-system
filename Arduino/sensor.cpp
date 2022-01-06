@@ -91,7 +91,8 @@ PULSE::PULSE(byte p, int t=500, int led=13){
 
 int PULSE::getBPM(){
   int myBPM = pulseSensor.getBeatsPerMinute();
-  if(myBPM > 200) return -1;
+  if(myBPM > 200) return 200;
+  if(myBPM < 60) return 60;
   return myBPM;
 }
 
