@@ -1,5 +1,6 @@
 import json
 from datetime import datetime
+
 from flask import render_template, url_for, abort
 from flask import request
 
@@ -33,7 +34,13 @@ def event(token):
         user_object = User.query.get(event_object.user_id)
         event_location = json.loads(event_object.location)
         event_status = json.loads(event_object.event_status)
-        editable = bool(request.values.get('editable', False))
+        
+        if request.values.get('editable', None) == 'true':
+            editable = True
+        elif request.values.get('editable', None) == 'false':
+            editable = False
+        else:
+            raise ValueError()
 
     except:
         abort(404)
@@ -53,15 +60,14 @@ def event(token):
         event_object.location = json.dumps(event_status, ensure_ascii=False)
         DatabaseManager.update(event_object)
 
-
     var = {
         'user': {'name': user_object.name, 'sex': user_object.sex, 'birthday': user_object.birthday},
         'event': {'time': event_object.time.strftime("%Y-%m-%d %H:%M"), 'gps': '', 'address': event_location['address']}, 
-        'record': event_status.sort(key=lambda msg: datetime.strptime(msg['time'], '%Y-%m-%d %H:%M'), reverse=True),
-        'editable': editable
+        'record': event_status.sort(key=lambda msg: datetime.strptime(msg['time'], '%Y-%m-%d %H:%M'), reverse=True) or [],
+        'token': token, 'editable': editable
     }
 
-    var['gps'] = '{longitude}°E {latitude}°N'.format(
+    var['event']['gps'] = '{longitude}°E , {latitude}°N'.format(
         longitude=event_location['gps']['longitude'],
         latitude=event_location['gps']['latitude']
     )

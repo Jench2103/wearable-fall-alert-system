@@ -1,5 +1,5 @@
 from __future__ import annotations
-from enum import unique
+
 import json
 import random
 import string
@@ -59,6 +59,7 @@ class User(db.Model):
         self.birthday = kwargs['birthday'] if 'birthday' in kwargs else None
         self.blood_type = kwargs['blood_type'] if 'blood_type' in kwargs else None
         self.line_id = kwargs['line_id'] if 'line_id' in kwargs else None
+        self.hospital = kwargs['hospital'] if 'hospital' in kwargs else None
 
     def __repr__(self) -> str:
         return '<User {}>'.format(self.username)
@@ -131,7 +132,7 @@ class EmergencyEvent(db.Model):
         self.time = time
         self.location = json.dumps(kwargs.get('location', None), ensure_ascii=False) if type(kwargs.get('location', None)) == dict else json.dumps(dict(), ensure_ascii=False)
         self.user_status = json.dumps(kwargs.get('user_status', None), ensure_ascii=False) if type(kwargs.get('user_status', None)) == dict else json.dumps(dict(), ensure_ascii=False)
-        self.event_status = json.dumps(kwargs.get('event_status', None), ensure_ascii=False) if type(kwargs.get('event_status', None)) == dict else json.dumps(dict(), ensure_ascii=False)
+        self.event_status = json.dumps(kwargs.get('event_status', None), ensure_ascii=False) if type(kwargs.get('event_status', None)) == list else json.dumps(list(), ensure_ascii=False)
         self.web_token = kwargs.get('web_token', '')
 
     def remove(self) -> bool:
@@ -219,7 +220,7 @@ class LineToken(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     owner_class_name = db.Column(db.String, unique=False)
-    owner_object_id = db.Column(db.Integer, unique=True)
+    owner_object_id = db.Column(db.Integer, unique=False)
     token_hash = db.Column(db.Text, unique=True)
     disposable = db.Column(db.Boolean)
     has_used = db.Column(db.Boolean, default=False)
@@ -253,6 +254,6 @@ class LineToken(db.Model):
                 continue
             if check_password_hash(token_object.token_hash, token):
                 token_object.has_used = True
-                DatabaseManager.update(token_object)
+                DatabaseManager.update()
                 return token_object
         return None

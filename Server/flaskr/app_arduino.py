@@ -4,6 +4,7 @@ import json
 
 from flask import abort, url_for
 from flask import request
+from linebot.models import MessageEvent, TextMessage, TextSendMessage
 
 from flaskr import app, line_bot_api
 from flaskr.models import User, EmergencyContact, EmergencyEvent, AmbulanceInfo, DistrictAffairsInfo, LineToken
@@ -39,7 +40,7 @@ def get_token():
     """
     class_name = request.args.get('type', None)
     owner_id = request.args.get('id', None)
-
+    
     try:
         owner_object = MODEL_CLASS_DICT[class_name].query.get(owner_id)
     except:
@@ -69,9 +70,9 @@ def create_user():
     except:
         abort(404)
     
-    name = request.args.get('id', None)
+    name = request.args.get('name', None)
     sex = request.args.get('sex', None)
-    birthday = request.args.get('birthday', None)
+    birthday = date.fromisoformat(request.args.get('birthday', None)) if request.args.get('birthday', None) else None
     blood_type = request.args.get('blood_type', None)
     hospital = request.args.get('hospital', None)
 
@@ -128,11 +129,18 @@ def new_event():
 
     try:
         user = User.query.get(int(request.args.get('user_id')))
-        heart_rate = int(request.args.get('user_id'))
+        heart_rate = int(request.args.get('heart_rate'))
         gps_longitude = float(request.args.get('gps_longitude'))
         gps_latitude = float(request.args.get('gps_latitude'))
+        phone_gps_longitude = float(request.args.get('phone_gps_longitude'))
+        phone_gps_latitude = float(request.args.get('phone_gps_latitude'))
+
     except:
         abort(404)
+
+    if gps_longitude == 0.0 or gps_latitude == 0:
+        gps_longitude = phone_gps_longitude if phone_gps_longitude != 0.0 else 120.216792802224
+        gps_latitude = phone_gps_latitude if phone_gps_latitude != 0.0 else 22.99887729057317
 
     gmap_response = requests.request(
         'get', 
@@ -143,38 +151,34 @@ def new_event():
         )
     )
 
-    if gmap_response.status_code == 200:
-        address = json.loads(gmap_response)['results'][0]['formatted_address']
-    else:
+    try:
+        address = json.loads(gmap_response.text)['results'][0]['formatted_address']
+    except:
         address = ''
-        
-    location = {'gps': {'longitude': gps_longitude, 'latitude': gps_latitude}, 'address': address}
 
     emergency_event = EmergencyEvent.create(
         user.id, 
-        time=datetime.now(), 
-        location=json.dumps(location, ensure_ascii=False),
-        user_status=json.dumps({'heart_rate': heart_rate})
+        location={'gps': {'longitude': gps_longitude, 'latitude': gps_latitude}, 'address': address},
+        user_status={'heart_rate': heart_rate}
     )
 
     linebot_message = {
-        'emergency_contact': '\
-            【事件通報】您關注的使用者{name}在{datetime}於「{address}」附近\
-            發生疑似意外摔跌事件（GPS座標：{latitude}, {longitude}），系統已自動通報救護單位前往處置，\
-            並告知優先送治醫院：「{hospital}」，實際送治醫療院所以救護單位資訊為準。\
-            您可以利用 {url} 查看本次事件的最新狀態。\
-            '.format(
+        'emergency_contact': \
+            ('【事件通報】您關注的使用者{name}在{datetime}於「{address}」附近' + \
+            '發生疑似意外摔跌事件（GPS座標：{latitude}, {longitude}），系統已自動通報救護單位前往處置，' + \
+            '並告知優先送治醫院：「{hospital}」，實際送治醫療院所以救護單位資訊為準。' + \
+            '您可以利用 {url} 查看本次事件的最新狀態。').format(
                 name=user.name, 
                 datetime=emergency_event.time.strftime("%Y-%m-%d %H:%M"),
                 address=address,
                 latitude=str(gps_latitude), 
                 longitude=str(gps_longitude), 
                 hospital=user.hospital,
-                url=url_for('event', token=emergency_event.web_token, editable='False', _external=True)
+                url=url_for('event', token=emergency_event.web_token, editable='false', _external=True)
             )
     }
 
     for emergency_contact in (EmergencyContact.query.filter_by(user_id=user.id).all() or []):
-        line_bot_api.push_message(emergency_contact.line_id, linebot_message['emergency_contact'])
+        line_bot_api.push_message(emergency_contact.line_id, TextSendMessage(text=linebot_message['emergency_contact']))
 
     return str(emergency_event.web_token)

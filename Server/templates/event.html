@@ -134,7 +134,7 @@
               <h3>事件基本資料</h3>
               <p>
                 時　間：{{ var['event']['time'] }}<br>
-                地　點：{{ var['event']['gps'] }} （概略地址 → {{ var['event']['address'] }}）<br>
+                地　點：{{ var['event']['gps'] }} {% if var['event']['address']|length != 0 %}（概略地址 → {{ var['event']['address'] }}）{% endif %}<br>
               </p>
             </div>
 
@@ -184,7 +184,7 @@
         <div class="col-xl-10 offset-xl-1">
           <h2 class="mb-4">提交最新狀態</h2>
 
-          <form method="POST" action="{{ url_for(request.endpoint) }}" enctype="application/x-www-form-urlencoded">
+          <form method="POST" action="{{ url_for('event', token=var['token'], editable=var['editable']) }}" enctype="application/x-www-form-urlencoded">
             <div class="input-group mb-3">
               <label class="input-group-text" for="agencyTypeSelect">機構類別</label>
               <select class="form-select" id="agencyTypeSelect" name="agency-type" required>
