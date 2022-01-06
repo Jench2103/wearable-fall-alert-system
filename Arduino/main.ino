@@ -15,15 +15,15 @@ int16_t prev_accx2 = 0;
 int16_t prev_accy2 = 0;
 int16_t prev_accz2 = 0;
 bool mpu_available(int index=0);
-bool is_moving(int t1=30, int t2=30);
+bool is_moving(double t1=1.7, double t2=1.7);
 
 GPS gps;
 PULSE pulse(3);
 BUZZER buzzer(7);
 BLUETOOTH bluetooth;
 int button = 5;
-bool send = false;
-bool debug = true;
+bool event = false;
+bool debug = false;
 
 void setup()
 {
@@ -31,33 +31,47 @@ void setup()
     Wire.begin();
     mpu_1.initialize();
     mpu_2.initialize();
-    pinMode(button, OUTPUT); 
+    pinMode(button, INPUT_PULLUP);
 }
 
 void loop()
 {
     //數值更新
-    if(gps.enable())    //更新gps位置
+    if(gps.enable()){    //更新gps位置
         gps.locationUpdate();
-
+    }
+    double location[2] = {gps.getLongitude(), gps.getLatitude()};
+    int BPM = pulse.getBPM();
+    
     //事件發生
-    if(is_moving && !send){
-        double location[2] = {gps.getLongitude(), gps.getLatitude()};
-        int BPM = pulse.getBPM();
-        bluetooth.arduino_to_phone(location[0], location[1], BPM);
-        send = true;
+    Serial.print("event: ");
+    Serial.println(event);
+    if(is_moving() && !event){
+        event = true;
+        bluetooth.BTSerial.print('1');
+    }
+
+    bluetooth.phone_to_arduino(event, location[0], location[1], BPM);
+    Serial.print("received :");
+    Serial.println(bluetooth.message_from_phone);
+    //Serial.print("message: ");
+    //Serial.println(bluetooth.event_message);
+
+    if (bluetooth.message_from_phone == '1') {
+        Serial.print("bluetooth.string_to_phone: ");
+        Serial.println(bluetooth.string_to_phone);
     }
 
     if(bluetooth.if_buzzer_on == 1){   //兩分鐘內，app傳送打開蜂鳴器的訊息
         buzzer.on();
+        event = false;
     }else if(bluetooth.if_buzzer_on == 0){    //兩分鐘內，app傳送"不用"打開蜂鳴器的訊息
-        send = false;
         bluetooth.reset();
     }
-    
-    if(digitalRead(button)){   //兩分鐘後，arduino上的蜂鳴器
+
+    if(digitalRead(button) == 0){   //兩分鐘後，arduino上的蜂鳴器
         buzzer.off();
-        send = false;
+        event = false;
         bluetooth.reset();
     }
 }
@@ -74,17 +88,19 @@ bool mpu_available(int index=0){
     }
 }
 
-bool is_moving(int t1=3, int t2=3){   //mpu1及mpu2的xyz方向現在是否在移動
+bool is_moving(double t1=1.7, double t2=1.7){   //mpu1及mpu2的xyz方向現在是否在移動
     int16_t ax1, ay1, az1, gx1, gy1, gz1;   //mpu1
+    mpu_1.getMotion6(&ax1, &ay1, &az1, &gx1, &gy1, &gz1);
     float accx1 = ((float)(ax1 - prev_accx2) / 16384) * ((float)(ax1 - prev_accx2) / 16384);
     float accy1 = ((float)(ay1 - prev_accy2) / 16384) * ((float)(ay1 - prev_accy2) / 16384);
     float accz1 = ((float)(az1 - prev_accz2) / 16384) * ((float)(az1 - prev_accz2) / 16384);
 
-    prev_accx2 = ax1;
-    prev_accy2 = ay1;
-    prev_accz2 = az1;
+    prev_accx1 = ax1;
+    prev_accy1 = ay1;
+    prev_accz1 = az1;
 
     int16_t ax2, ay2, az2, gx2, gy2, gz2;   //mpu2
+    mpu_2.getMotion6(&ax2, &ay2, &az2, &gx2, &gy2, &gz2);
     float accx2 = ((float)(ax2 - prev_accx2) / 16384) * ((float)(ax2 - prev_accx2) / 16384);
     float accy2 = ((float)(ay2 - prev_accy2) / 16384) * ((float)(ay2 - prev_accy2) / 16384);
     float accz2 = ((float)(az2 - prev_accz2) / 16384) * ((float)(az2 - prev_accz2) / 16384);
