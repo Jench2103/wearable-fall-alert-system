@@ -55,7 +55,7 @@ class User(db.Model):
         self.username = username
         # self.password_hash = generate_password_hash(kwargs['password']) if 'password' in kwargs else None
         self.name = kwargs['name'] if 'name' in kwargs else None
-        self.sex = kwargs['sex'] if '' in kwargs else None
+        self.sex = kwargs['sex'] if 'sex' in kwargs else None
         self.birthday = kwargs['birthday'] if 'birthday' in kwargs else None
         self.blood_type = kwargs['blood_type'] if 'blood_type' in kwargs else None
         self.line_id = kwargs['line_id'] if 'line_id' in kwargs else None

@@ -1,7 +1,7 @@
 import json
-from datetime import datetime
+from datetime import datetime, date
 
-from flask import render_template, url_for, abort
+from flask import render_template, url_for, abort, flash
 from flask import request
 
 from flaskr.models import User, EmergencyEvent, DatabaseManager
@@ -23,6 +23,34 @@ def privacy():
 @app.route('/terms', methods=['GET'])
 def terms():
     return render_template('terms.html')
+
+@app.route('/sign-up', methods=['GET', 'POST'])
+def sign_up():
+    var = {
+        'username': '', 'name': '', 'gender':'', 'birthday': '', 'blood-type': '', 
+        'hospital-city': '', 'hospital': ''
+    }
+
+    if request.method == 'POST':
+        var['username'] = request.form.get('username')
+        var['name'] = request.form.get('name')
+        var['gender'] = request.form.get('gender')
+        var['birthday'] = request.form.get('birthday')
+        var['blood-type'] = request.form.get('blood-type')
+        var['hospital-city'] = request.form.get('hospital-city')
+        var['hospital'] = request.form.get('hospital')
+
+        if var['username'] == None or len(var['username']) == 0 or var['username'].isspace():
+            flash('帳號欄位請勿留白')
+            return render_template('sign_up.html', var=var)
+
+        try:
+            new_user = User.create(var['username'], name=var['name'], sex=var['gender'], birthday=date.fromisoformat(var['birthday']), blood_type=var['blood-type'], hospital=var['hospital-city']+var['hospital'])
+            flash('帳號建立成功！請返回 App 畫面登入')
+        except:
+            flash('帳號名稱已存在，請以其他帳號嘗試註冊，謝謝')
+
+    return render_template('sign_up.html', var=var)
 
 @app.route('/event/<token>', methods=['GET', 'POST'])
 def event(token):

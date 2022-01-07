@@ -24,6 +24,8 @@ app = Flask(__name__, template_folder=FLASK_TEMPLATE_PATH, static_folder=FLASK_S
 # import config from config.py
 app.config.from_object(config)
 
+app.config['SECRET_KEY'] = os.urandom(256)
+
 line_bot_api = LineBotApi(app.config['LINEBOT_CHANNEL_ACCESS_TOKEN'])
 line_bot_handler = WebhookHandler(app.config['LINEBOT_CHANNEL_SECRET'])
 
