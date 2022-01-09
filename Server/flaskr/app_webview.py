@@ -12,17 +12,21 @@ from flaskr import app
 def index():
     return render_template('index.html')
 
+
 @app.route('/article', methods=['GET'])
 def article():
     return render_template('article.html')
+
 
 @app.route('/privacy', methods=['GET'])
 def privacy():
     return render_template('privacy.html')
 
+
 @app.route('/terms', methods=['GET'])
 def terms():
     return render_template('terms.html')
+
 
 @app.route('/sign-up', methods=['GET', 'POST'])
 def sign_up():
@@ -52,6 +56,7 @@ def sign_up():
 
     return render_template('sign_up.html', var=var)
 
+
 @app.route('/event/<token>', methods=['GET', 'POST'])
 def event(token):
     if token == 'example':
@@ -80,18 +85,18 @@ def event(token):
 
         event_status.append({
             'time': datetime.now().strftime("%Y-%m-%d %H:%M"), 
-            'type': agency_type, 
+            'type': '救護單位' if agency_type == 'ambulance' else ('醫療院所' if agency_type == 'hospital' else ''), 
             'agency': agency_name, 
             'content': content
         })
 
-        event_object.location = json.dumps(event_status, ensure_ascii=False)
-        DatabaseManager.update(event_object)
+        event_object.event_status = json.dumps(event_status, ensure_ascii=False)
+        DatabaseManager.update()
 
     var = {
         'user': {'name': user_object.name, 'sex': user_object.sex, 'birthday': user_object.birthday},
         'event': {'time': event_object.time.strftime("%Y-%m-%d %H:%M"), 'gps': '', 'address': event_location['address']}, 
-        'record': event_status.sort(key=lambda msg: datetime.strptime(msg['time'], '%Y-%m-%d %H:%M'), reverse=True) or [],
+        'record': sorted(event_status, key=lambda msg: datetime.strptime(msg['time'], '%Y-%m-%d %H:%M'), reverse=True) or [],
         'token': token, 'editable': editable
     }
 

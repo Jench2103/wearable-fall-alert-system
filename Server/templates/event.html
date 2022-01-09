@@ -158,7 +158,7 @@
               <div id="single-message" style="margin-bottom: 1rem;">
                 <img id="text-icon" src="{{ url_for('static', filename='icon/perm_identity_black_48dp.svg') }}"
                   style="height: 1.6rem; float: left; margin-right: 0.5rem;">
-                <span>{{ item['time'] }} {{ item['type'] }}【item['agency']】留言</span>
+                <span>{{ item['time'] }} {{ item['type'] }} 【{{item['agency']}}】留言</span>
 
                 <div class="card">
                   <div class="card-body">
@@ -184,7 +184,7 @@
         <div class="col-xl-10 offset-xl-1">
           <h2 class="mb-4">提交最新狀態</h2>
 
-          <form method="POST" action="{{ url_for('event', token=var['token'], editable=var['editable']) }}" enctype="application/x-www-form-urlencoded">
+          <form method="POST" action="{{ url_for('event', token=var['token'], editable=var['editable']|lower) }}" enctype="application/x-www-form-urlencoded">
             <div class="input-group mb-3">
               <label class="input-group-text" for="agencyTypeSelect">機構類別</label>
               <select class="form-select" id="agencyTypeSelect" name="agency-type" required>
