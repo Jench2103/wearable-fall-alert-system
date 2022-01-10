@@ -43,29 +43,28 @@ void loop()
     double location[2] = {gps.getLongitude(), gps.getLatitude()};
     int BPM = pulse.getBPM();
     
+    if(debug){
+        Serial.print("event: ");
+        Serial.println(event);
+    }
+
     //事件發生
-    Serial.print("event: ");
-    Serial.println(event);
     if(is_moving() && !event){
         event = true;
-        bluetooth.BTSerial.print('1');
+        bluetooth.send_1_to_phone();
     }
 
     bluetooth.phone_to_arduino(event, location[0], location[1], BPM);
-    Serial.print("received :");
-    Serial.println(bluetooth.message_from_phone);
+    //Serial.print("received :");
+    //Serial.println(bluetooth.message_from_phone);
     //Serial.print("message: ");
     //Serial.println(bluetooth.event_message);
-
-    if (bluetooth.message_from_phone == '1') {
-        Serial.print("bluetooth.string_to_phone: ");
-        Serial.println(bluetooth.string_to_phone);
-    }
 
     if(bluetooth.if_buzzer_on == 1){   //兩分鐘內，app傳送打開蜂鳴器的訊息
         buzzer.on();
         event = false;
     }else if(bluetooth.if_buzzer_on == 0){    //兩分鐘內，app傳送"不用"打開蜂鳴器的訊息
+        event = false;
         bluetooth.reset();
     }
 
