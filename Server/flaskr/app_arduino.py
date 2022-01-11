@@ -7,7 +7,7 @@ from flask import request
 from linebot.models import MessageEvent, TextMessage, TextSendMessage
 
 from flaskr import app, line_bot_api
-from flaskr.models import User, EmergencyContact, EmergencyEvent, AmbulanceInfo, DistrictAffairsInfo, LineToken
+from flaskr.models import DatabaseManager, User, EmergencyContact, EmergencyEvent, AmbulanceInfo, DistrictAffairsInfo, LineToken
 
 # constants
 MODEL_CLASS_DICT = {
@@ -139,8 +139,8 @@ def new_event():
         abort(404)
 
     if gps_longitude == 0.0 or gps_latitude == 0:
-        gps_longitude = phone_gps_longitude if phone_gps_longitude != 0.0 else 120.216792802224
-        gps_latitude = phone_gps_latitude if phone_gps_latitude != 0.0 else 22.99887729057317
+        gps_longitude = phone_gps_longitude
+        gps_latitude = phone_gps_latitude
 
     gmap_response = requests.request(
         'get', 
@@ -152,7 +152,7 @@ def new_event():
     )
 
     try:
-        address = json.loads(gmap_response.text)['results'][0]['formatted_address']
+        address = '於「{}」附近'.format(json.loads(gmap_response.text)['results'][0]['formatted_address']) 
     except:
         address = ''
 
@@ -162,9 +162,18 @@ def new_event():
         user_status={'heart_rate': heart_rate}
     )
 
+    emergency_event.event_status = json.dumps([{
+        'time': datetime.now().strftime("%Y-%m-%d %H:%M"), 
+        'type': '', 
+        'agency': '穿戴式摔跌警報系統', 
+        'content': '系統自動發送相關資訊予救護單位及緊急連絡人，告知優先送治醫院：「{hospital}」，實際送治醫院以救護單位決策為準'.format(hospital=user.hospital)
+    }])
+
+    DatabaseManager.update()
+
     linebot_message = {
         'emergency_contact': \
-            ('【事件通報】您關注的使用者{name}在{datetime}於「{address}」附近' + \
+            ('【事件通報】您關注的使用者：{name} 在 {datetime} {address}' + \
             '發生疑似意外摔跌事件（GPS座標：{latitude}, {longitude}），系統已自動通報救護單位前往處置，' + \
             '並告知優先送治醫院：「{hospital}」，實際送治醫療院所以救護單位資訊為準。' + \
             '您可以利用 {url} 查看本次事件的最新狀態。').format(
@@ -174,7 +183,7 @@ def new_event():
                 latitude=str(gps_latitude), 
                 longitude=str(gps_longitude), 
                 hospital=user.hospital,
-                url=url_for('event', token=emergency_event.web_token, editable='false', _external=True)
+                url=url_for('event', token=emergency_event.web_token, editable='false', _external=True, _scheme='https')
             )
     }
 
