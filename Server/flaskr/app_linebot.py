@@ -33,7 +33,8 @@ def handle_message(event):
     if match_token:
         if match_token.owner_class_name == 'User':
             user = User.query.get(match_token.owner_object_id)
-            EmergencyContact.create(user.id, line_id=event.source.user_id)
+            if EmergencyContact.query.filter_by(user_id=user.id, line_id=event.source.user_id).first() is None:
+                EmergencyContact.create(user.id, line_id=event.source.user_id)
             line_bot_api.reply_message(event.reply_token, TextSendMessage(
                 text='您已經成功註冊為 {name} 的緊急連絡人'.format(name=user.name)
             ))
