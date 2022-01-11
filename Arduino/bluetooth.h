@@ -9,13 +9,15 @@ String double2str(double num, int length)
     String result = "";
     bool positive = num > 0.0;
 
-    if (num == 0.0) {
+    if (num == 0.0)
+    {
         result = "0.";
 
-        for (int i = 0; i < length - 2; ++i) {
+        for (int i = 0; i < length - 2; ++i)
+        {
             result += '0';
         }
-        
+
         return result;
     }
 
@@ -59,9 +61,10 @@ private:
 BLUETOOTH::BLUETOOTH() : BTSerial(10, 11) // setup // 宣告10腳位為Arduino的RX 、11為Arduino的 TX
 {
     BTSerial.begin(9600);
+    // BTSerial.begin(38400);
 }
 
-int BLUETOOTH::phone_to_arduino(bool event, double gps_longtitude = 0, double gps_latitude = 0, int bpm = 0) // 接收手機藍芽傳的訊號: 傳使用者資訊/是否開啟蜂鳴器
+int BLUETOOTH::phone_to_arduino(bool event, double gps_longtitude, double gps_latitude, int bpm) // 接收手機藍芽傳的訊號: 傳使用者資訊/是否開啟蜂鳴器
 {
     if (BTSerial.available())
     {
@@ -70,7 +73,7 @@ int BLUETOOTH::phone_to_arduino(bool event, double gps_longtitude = 0, double gp
 
         switch (message_from_phone)
         {
-        case '0': //收到'0': 不開啟蜂鳴器
+        case 'b': //收到'0': 不開啟蜂鳴器
             if_buzzer_on = 0;
             break;
 
