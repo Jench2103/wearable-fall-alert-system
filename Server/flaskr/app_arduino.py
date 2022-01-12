@@ -166,7 +166,8 @@ def new_event():
         'time': datetime.now().strftime("%Y-%m-%d %H:%M"), 
         'type': '', 
         'agency': '穿戴式摔跌警報系統', 
-        'content': '系統自動發送相關資訊予救護單位及緊急連絡人，告知優先送治醫院：「{hospital}」，實際送治醫院以救護單位決策為準'.format(hospital=user.hospital)
+        'content': '系統已自動發送相關資訊予救護單位及緊急連絡人，告知優先送治醫院：「{hospital}」，'.format(hospital=user.hospital) + \
+            '使用者當下心率 {heart_rate} ，實際送治醫院以救護單位決策為準'.format(heart_rate=heart_rate)
     }])
 
     DatabaseManager.update()
@@ -183,7 +184,7 @@ def new_event():
                 latitude=str(gps_latitude), 
                 longitude=str(gps_longitude), 
                 hospital=user.hospital,
-                url=url_for('event', token=emergency_event.web_token, editable='false', _external=True, _scheme='https')
+                url=url_for('event', token=emergency_event.web_token, editable='false', _external=True, _scheme=request.scheme)
             )
     }
 
