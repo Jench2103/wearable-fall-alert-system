@@ -16,10 +16,11 @@
 ## Structure of the Project
 ```bash
 Wearable Fall Alert System
-    ├── Arduino/        # source code for Arduino
-    ├── Server/         # source code for Linebot and database server
-    └── workspace/      # docker workspace for server development
-        └── run         # workspace controlling script
+    ├── android-application/    # android application developed with App Inventor
+    ├── Arduino/                # source code for Arduino
+    ├── Server/                 # source code for Linebot and database server
+    └── workspace/              # docker workspace for server development
+        └── run                 # workspace controlling script
 ```
 
 
