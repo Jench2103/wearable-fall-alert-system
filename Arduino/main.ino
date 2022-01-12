@@ -15,7 +15,7 @@ int16_t prev_accx2 = 0;
 int16_t prev_accy2 = 0;
 int16_t prev_accz2 = 0;
 bool mpu_available(int index = 0);
-bool is_moving(double t1 = 1.7, double t2 = 1.7);
+bool is_moving(double t1 = 1.7, double t2 = 0.5);
 
 GPS gps;
 PULSE pulse(3);
@@ -105,9 +105,9 @@ bool is_moving(double t1, double t2)
 {                                         //mpu1及mpu2的xyz方向現在是否在移動
     int16_t ax1, ay1, az1, gx1, gy1, gz1; //mpu1
     mpu_1.getMotion6(&ax1, &ay1, &az1, &gx1, &gy1, &gz1);
-    float accx1 = ((float)(ax1 - prev_accx2) / 16384) * ((float)(ax1 - prev_accx2) / 16384);
-    float accy1 = ((float)(ay1 - prev_accy2) / 16384) * ((float)(ay1 - prev_accy2) / 16384);
-    float accz1 = ((float)(az1 - prev_accz2) / 16384) * ((float)(az1 - prev_accz2) / 16384);
+    float accx1 = ((float)(ax1 - prev_accx1) / 16384) * ((float)(ax1 - prev_accx1) / 16384);
+    float accy1 = ((float)(ay1 - prev_accy1) / 16384) * ((float)(ay1 - prev_accy1) / 16384);
+    float accz1 = ((float)(az1 - prev_accz1) / 16384) * ((float)(az1 - prev_accz1) / 16384);
 
     prev_accx1 = ax1;
     prev_accy1 = ay1;
