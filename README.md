@@ -1,6 +1,15 @@
 # Wearable Fall Alert System
 
 
+## Group Members
+|                  Name                   |          Email           |
+|:---------------------------------------:|:------------------------:|
+| [張仁謙](https://github.com/Jench2103)  | E24084208@gs.ncku.edu.tw |
+|  [王宣雅](https://github.com/hsuanya)   | E24086640@gs.ncku.edu.tw |
+| [廖祐誼](https://github.com/RuoliiLiao) | E24084711@gs.ncku.edu.tw |
+| [郭佩穎](https://github.com/KuoRegina)  | E24086153@gs.ncku.edu.tw |
+
+
 ## Table of Contents
 - [Structure of the Project](#structure-of-the-project)
 - [Environment Setup](#environment-setup)
@@ -17,8 +26,8 @@
 ```bash
 Wearable Fall Alert System
     ├── android-application/    # android application developed with App Inventor
-    ├── Arduino/                # source code for Arduino
-    ├── Server/                 # source code for Linebot and database server
+    ├── arduino/                # source code for Arduino
+    ├── server/                 # source code for Linebot and database server
     └── workspace/              # docker workspace for server development
         └── run                 # workspace controlling script
 ```
