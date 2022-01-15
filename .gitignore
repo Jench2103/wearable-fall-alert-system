@@ -2,13 +2,13 @@
 .vscode/
 
 # Arduino
-Arduino/test.ino
+arduino/test.ino
 
 # Server
-Server/__pycache__/
-Server/data/
-Server/flaskr/__pycache__/
-Server/volume/
+server/__pycache__/
+server/data/
+server/flaskr/__pycache__/
+server/volume/
 
 # workspace
 workspace/server_requirements.txt
