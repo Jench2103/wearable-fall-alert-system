@@ -1,4 +1,5 @@
 # Wearable Fall Alert System
+This is the final project of Group 7 on SINGLE CHIP SYSTEM DESIGN & APPLICATION (Fall 2021) in NCKUEE. The project combined Arduino, sensor modules, android app, Line bot, and website to realize a system which could detects fall accidents, sends messages to call for help automatically, and provides an information & status center for users' families, EMS, and hospitals.
 
 
 ## Group Members
